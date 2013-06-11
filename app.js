@@ -132,28 +132,46 @@ app.get('/initdb', function(req, res) {
 });
 
 app.get('/readdb', function(req, res) {
+    var db = redis.createClient(app.get('redis-port'));
+
+    db.keys('rsvp:*').then(function(keys) {
+        return db.send('mget', keys);
+    }).then(function(values) {
+        res.send(values);
+    });
+});
+
+app.get('/hash', function(req, res) {
+    var db = redis.createClient(app.get('redis-port'));
+
+    db.hgetall('buckets').then(function(hash) {
+       res.send(hash);
+    });
+});
+
+
+app.get('/oldreaddb', function(req, res) {
     console.log('redis port:' + app.get('redis-port'));
 
-    var values = 'DB:\n';
+    var buckets = {};
 
-    redis.connect(app.get('redis-port')).then(function (db) {
+    redis.connect(app.get('redis-port')).then(function(db) {
+        console.log('about to do DB query');
         db.keys('rsvp:*').then(function(keys) {
-            console.log(keys);
-            values += keys;
             db.send('mget', keys).then(function(reply) {
-                values += reply;
-                console.log(reply);
+                _.map(keys, function(k) {
+                    db.get(k).then(function(v) {
+                        console.log(k + ':' + v);
+                        buckets.k = v;
+                    });
+                });
             });
-            // _.map(keys, function(k) {
-            //     db.get(k).then(function(v) {
-            //         var s = k + v + '\n';
-            //         console.log(s);
-            //         values += s;
-            //     });
-            // });
         });
+        return buckets;
+    }).then(function(values) {
+        console.log('finished DB query');
+        res.send(buckets);
     });
-    res(values);
 });
 
 app.get('/debug', function(req, res) {
