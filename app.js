@@ -29,16 +29,7 @@ app.configure(function() {
     app.use(express.methodOverride());
     app.use(express.static(__dirname + '/static'));
 
-    // app.use(function(req, res, next) {
-    //     res.locals.email = 'cyndi'
-    //     // res.locals.code = 'family2013';
-    //     res.locals.fullname = 'Cyndi Stanfield';
-
-    //     next();
-    // });
-    
     app.use(app.router);
-
 
     app.use(myErrorHandler);
 });
@@ -98,12 +89,6 @@ app.get('/test', function(req, res) {
 });
 
 app.post('/rsvp', function(req, res) {
-    console.log('inside rsvp');
-
-    console.log('fullname: ' + req.body.fullname);
-    console.log('email: ' + req.body.email);
-    console.log('code: ' + req.body.code);
-
     req.checkBody('fullname', 'Name is required').notEmpty();
     req.checkBody('email', 'A valid email is required').isEmail();
     req.checkBody('code', 'An RSVP code is required').notEmpty();
