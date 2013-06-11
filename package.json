@@ -1,0 +1,20 @@
+{
+  "name": "rsvp2",
+  "version": "0.0.1",
+  "scripts": {
+    "start": "node app"
+  },
+  "dependencies": {
+    "express": "3.0.0rc3",
+    "jade": "*",
+    "stylus": "*",
+    "connect": "~2.7.11",
+    "then-redis": "~0.3.8",
+    "express-validator": "https://github.com/ctavan/express-validator/tarball/master",
+    "moment": "~2.0.0",
+    "underscore": "~1.4.4"
+  },
+  "engines": {
+    "node": "0.10.*"
+  }
+}

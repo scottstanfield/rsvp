@@ -1,0 +1,20 @@
+- function y() {
+  ul.errors
+    each e in alerts.errors 
+      li= e
+- }
+
+- if (typeof alerts != 'undefined')
+  case alerts.style
+    when 'warning' 
+      .alert=alerts.msg
+        - y()
+    when 'success'
+      .alert.alert-success=alerts.msg
+        - y()
+    when 'error'
+      .alert.alert-error #{alerts.msg}
+        - y()
+    when 'info'
+      .alert.alert-info=alerts.msg
+        - y()

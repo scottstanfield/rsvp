@@ -1,0 +1,8 @@
+- if (typeof noticeText !== 'undefined')
+  .alert=noticeText
+- if (typeof errorText !== 'undefined')
+  .alert.alert-error=errorText
+    - if (typeof errorArray !== 'undefined')
+      ul.errors
+        each e in errorArray
+          li= e
