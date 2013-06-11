@@ -15,6 +15,9 @@ var app = express();
 //
 app.configure(function() {
     app.set('port', process.env.PORT || 3000);
+
+    app.set('redis-port', process.env.REDISTOGO_URL || 'tcp://127.0.0.1:6379');
+
     app.set('views', __dirname + '/views');   // nomrally __dirname + "/views");
     app.set('view engine', 'jade');
 
@@ -45,6 +48,7 @@ app.configure('development', function() {
 });
 
 app.configure('production', function() {
+    console.log('in production mode');
     app.use(express.errorHandler());
     // sendgrid = new SendGrid(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
 });
@@ -114,12 +118,47 @@ app.get('/rsvp', function(req, res) {
 });
 
 
-
 // debug
+
+app.get('/initdb', function(req, res) {
+    console.log('redis port:' + app.get('redis-port'));
+
+    redis.connect(app.get('redis-port')).then(function (db) {
+        db.set('rsvp:rds',  50);
+        db.set('rsvp:mvps', 20);
+        db.set('rsvp:devexpress', 6);
+    });
+    res.send('initdb');
+});
+
+app.get('/readdb', function(req, res) {
+    console.log('redis port:' + app.get('redis-port'));
+
+    var values = 'DB:\n';
+
+    redis.connect(app.get('redis-port')).then(function (db) {
+        db.keys('rsvp:*').then(function(keys) {
+            console.log(keys);
+            values += keys;
+            db.send('mget', keys).then(function(reply) {
+                values += reply;
+                console.log(reply);
+            });
+            // _.map(keys, function(k) {
+            //     db.get(k).then(function(v) {
+            //         var s = k + v + '\n';
+            //         console.log(s);
+            //         values += s;
+            //     });
+            // });
+        });
+    });
+    res(values);
+});
 
 app.get('/debug', function(req, res) {
 
-    redis.connect().then(function (db) {
+    redis.connect(app.get('redis-port')).then(function (db) {
         db.get('rsvp:rds').then(function(value) {
             var answer = '';
             answer += 'Your IP: ' + req.ip + '\n';
