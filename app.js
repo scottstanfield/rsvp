@@ -7,9 +7,6 @@
     var redis = require('then-redis');
     var expressValidator = require('express-validator');
 
-    // var SendGrid = require('sendgrid').SendGrid;
-    var sendgrid = {};
-
     var withRedis = function(res, onRedisConnect) {
         var redisport = process.env.REDISTOGO_URL || 'tcp://127.0.0.1:6379';
         redis.connect(redisport).then(function(db) {
@@ -47,32 +44,16 @@
 
     app.configure('development', function() {
         app.locals.pretty = true;           // jade will render nice HTML
-        sendgrid = {
-            send: function(opts, cb) {
-                console.log('Email:', opts);
-                cb(true, opts);
-            }
-        };
-    });
+   });
 
     app.configure('production', function() {
         console.log('in production mode');
         app.use(express.errorHandler());
-        // sendgrid = new SendGrid(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
     });
 
     // app.locals is new in Express 3. Pre-initialize errors and message for use later.
     app.locals.errors = {};
     app.locals.message = {};
-
-    function sendEmail(message, fn) {
-        sendgrid.send( {
-            to: process.env.EMAIL_RECIPIENT,
-            from: message.email,
-            subject: 'Contact message',
-            text: message.message
-        }, fn);
-    }
 
     // ROUTES
     //
