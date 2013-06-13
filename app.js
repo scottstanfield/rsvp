@@ -98,42 +98,41 @@
         // 'codes' holds the available tickets like 'rds' or 'mvps'
         // 'rsvp'  holds the people that have RSVPd
 
-        if (!errors) {
-            withRedis(res, function(db) {
-
-                // check if user already rsvp'd
-                db.hexists('rsvp', email).then(function(alreadyRegistered) {
-                    if(alreadyRegistered) {
-                        return renderMsg(Alert.info, 'You\'ve already registered, silly');
-                    }
-
-                    // check if the specific rsvp code exists
-                    db.hexists('codes', code).then(function(codeIsGood) {
-                        if(!codeIsGood) {
-                            return renderMsg(Alert.error, 'That RSVP code is not valid.');
-                        }
-
-                        // decrement the supplied code
-                        db.hincrby('codes', code, -1).then(function(result) {
-                            if(result <= 0) {
-                                return renderMsg(Alert.warning, 'That RSVP code is no longer valid.');
-                            }
-
-                            // successfully decremented and we have a valid partier
-                            // save the registered partier's name
-                            db.hset('rsvp', email, JSON.stringify({ name: fullname, code: code })).then(function(){
-                                return renderMsg(Alert.success, 'Your code is valid. Thanks for RSVPing!');
-                            }, reallyBadError);
-                        }, reallyBadError);
-                    }, reallyBadError);
-                }, reallyBadError);
-            });
-         } else {
+        if (errors) {
             var e = errors.map(function(n) { return n.msg; });
             alertbox(res, Alert.error, 'Please correct the following:', e);
             return res.render('index');
         }
+        
+        withRedis(res, function(db) {
 
+            // check if user already rsvp'd
+            db.hexists('rsvp', email).then(function(alreadyRegistered) {
+                if(alreadyRegistered) {
+                    return renderMsg(Alert.info, 'You\'ve already registered, silly');
+                }
+
+                // check if the specific rsvp code exists
+                db.hexists('codes', code).then(function(codeIsGood) {
+                    if(!codeIsGood) {
+                        return renderMsg(Alert.error, 'That RSVP code is not valid.');
+                    }
+
+                    // decrement the supplied code
+                    db.hincrby('codes', code, -1).then(function(result) {
+                        if(result <= 0) {
+                            return renderMsg(Alert.warning, 'That RSVP code is no longer valid.');
+                        }
+
+                        // successfully decremented and we have a valid partier
+                        // save the registered partier's name
+                        db.hset('rsvp', email, JSON.stringify({ name: fullname, code: code })).then(function(){
+                            return renderMsg(Alert.success, 'Your code is valid. Thanks for RSVPing!');
+                        }, reallyBadError);
+                    }, reallyBadError);
+                }, reallyBadError);
+            }, reallyBadError);
+        });
     });
 
     app.get('/error', function(req, res) {
