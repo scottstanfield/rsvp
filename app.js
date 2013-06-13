@@ -4,14 +4,14 @@
     var express = require('express');
     var http = require('http');
     var moment = require('moment');
-//var _ = require('underscore');
     var redis = require('then-redis');
     var expressValidator = require('express-validator');
+    var _ = require('underscore');
 
     // var SendGrid = require('sendgrid').SendGrid;
     var sendgrid = {};
 
-    var withRedis = function(onRedisConnect, res) {
+    var withRedis = function(res, onRedisConnect) {
         var redisport = process.env.REDISTOGO_URL || 'tcp://127.0.0.1:6379';
         redis.connect(redisport).then(function(db) {
             onRedisConnect(db);
@@ -101,101 +101,72 @@
         res.render('test');
     });
 
-    // app.post('/rsvp', function(req, res) {
-    //     req.checkBody('fullname', 'Name is required').notEmpty();
-    //     req.checkBody('email', 'A valid email is required').isEmail();
-    //     req.checkBody('code', 'An RSVP code is required').notEmpty();
+    app.post('/', function(req, res) {
+        req.checkBody('fullname', 'Name is required').notEmpty();
+        req.checkBody('email', 'A valid email is required').isEmail();
+        req.checkBody('code', 'An RSVP code is required').notEmpty();
 
-    //     var errors = req.validationErrors();
+        var errors = req.validationErrors();
 
-    //     res.locals.fullname = req.body.fullname;
-    //     res.locals.code = req.body.code;
-    //     res.locals.email = req.body.email;
+        var fullname = res.locals.fullname = req.body.fullname;
+        var email = res.locals.email = req.body.email;
+        var code = res.locals.code = req.body.code;
+        var renderMsg = function(alertType, msg){
+            alertbox(res, alertType, msg);
+            res.render('index');
+        }
 
-    //     if (!errors) {
+        // two keys:
+        // 'codes' holds the available tickets like 'rds' or 'mvps'
+        // 'rsvp'  holds the people that have RSVPd
 
-    //         function doSomeStuffWithRsvps(rsvps) {
+        function doSomeStuffWithRsvps(rsvps) {
+            withRedis(res, function(db) {
+                db.hexists('rsvp', email).then(function(alreadyRegistered) {
+                    if(alreadyRegistered) {
+                        return renderMsg(Alert.info, 'You\'ve already registered, silly');
+                    } else {
+                        db.hexists('codes', code).then(function(codeIsGood) {
+                            if(codeIsGood) {
+                                db.hincrby('codes', code, -1).then(function(result) {
+                                    if(result <= 0) {
+                                        return renderMsg(Alert.warning, 'That RSVP code is no longer valid.');
+                                    } else {
+                                        db.hset('rsvp', email, JSON.stringify({ name: fullname, code: code }));
+                                        return renderMsg(Alert.success, 'Your code is valid. Thanks for RSVPing!');
+                                    }
+                                }, function(err) {
+                                    // do error
+                                });
+                            } else {
+                                return renderMsg(Alert.warning, 'That RSVP code is not valid.');
+                            }
+                        }, function(){
+                            // do error
+                        });
+                    }
+                }, function() {
+                    // do error
+                });
+            });
+        }
 
-    //             // if to see if users already rsvp'd
-    //             //      redirect to already registered page
-    //             //
-    //             // if rsvp code not correct
-    //             //      redirect to incorrect code page
-    //             // 
-    //             // all seems good - save the data
-    //             // redirect to successfully rsvp'd page.
-    //             //
-    //             //
-    //         }
+        if (!errors) {
+            doSomeStuffWithRsvps();
 
-    //         var getRsvps = function (callback, errorCallback) {
-    //             var port = app.get('redis-port');
+        } else {
+            var e = _.map(errors, function(n) { return n.msg; });
+            alertbox(res, Alert.error, 'Please correct the following:', e);
+            return renderSuccess();
+        }
 
-    //             redis.connect(port).then(function(db) {
-
-    //                 db.hgetall('rsvps').then(function(hash) {
-    //                     // if buckets doesn't exist
-    //                     if(!Object.keys(hash).length) {
-    //                         db.hmset('rsvps', {
-    //                             'rds': 50,
-    //                             'mvps': 20,
-    //                             'msft': 30,
-    //                             'devexpress': 10,
-    //                             'preempt': 15,
-    //                             'vertigo': 10
-    //                         }).then(function(){
-
-    //                             db.hgetall('rsvps').then(function(hash) {
-    //                                 callback(hash);
-    //                             }, function(){
-    //                                 errorCallback('Could not create and load rsvps');
-    //                             });
-    //                         }, function(){
-    //                             console.log('error hmset(\'rsvps\'');
-    //                             console.log(arguments);
-    //                             errorCallback('Could not create and load rsvps');
-    //                         });
-    //                     }
-    //                     else {
-    //                         doSomeStuffWithRsvps(hash);
-    //                     }
-    //                 });
-    //             }, function (error) {
-    //                 console.log('Failed to conenct to Redis: ' + error);
-    //                 // res.send(500);
-    //                 res.render('500', { error: error });
-    //                 return;
-    //             });
-    //         };
-
-    //         getRsvps(function(rsvps){
-    //             doSomeStuffWithRsvps(rsvps);
-    //         }, function(err) {
-    //             //todo handle error???
-    //         });
-
-    //         alertbox(res, Alert.success, 'Your code is valid. Thanks for RSVPing!');
-
-    //         return;
-    //     } else {
-    //         var e = _.map(errors, function(n) { return n.msg; });
-    //         alertbox(res, Alert.error, 'Please correct the following:', e);
-    //     }
-
-    //     res.render('index');
-    // });
-
-    app.get('/rsvp', function(req, res) {
-        res.redirect('/');
     });
-
 
     // REDIS manipulation functions
 
     app.get('/initdb', function(req, res) {
-        console.log('redis port:' + app.get('redis-port'));
-        
-        withRedis(function(db, res){
+
+        withRedis(res, function(db){
             db.set('rsvp:rds',  50);
             db.set('rsvp:mvps', 20);
             db.set('rsvp:devexpress', 6);
@@ -226,7 +197,7 @@
         var field = req.params.field;       
         var value = req.params.value;       
 
-        withRedis(function(db, res){
+        withRedis(res, function(db){
             db.hset(key, field, value).then(function(result) {
                 res.send(result);
             });
@@ -237,7 +208,7 @@
         var key = req.params.key;       
         console.log('deleting: ' + key);
 
-        withRedis(function(db, res){
+        withRedis(res, function(db){
             db.del(key).then(function(result) {
                 res.send(result);
             });
@@ -249,7 +220,7 @@
         var key = req.params.key;       // skipping validity checks
         console.log(key);
 
-        withRedis(function(db, res){
+        withRedis(res, function(db){
              db.hgetall(key).then(function(hash) {
                 res.send(hash);
             });
@@ -258,7 +229,7 @@
     });
 
     app.get('/readhash2', function(req, res) {
-        withRedis(function(db, res){
+        withRedis(res, function(db){
             db.hgetall('rsvp').then(function(hash) {
                 res.send(hash);
             });
@@ -273,7 +244,7 @@
 
     app.get('/debug', function(req, res) {
 
-        withRedis(function(db, res){
+        withRedis(res, function(db){
             db.get('rsvp:rds').then(function(value) {
                 var answer = '';
                 answer += 'Your IP: ' + req.ip + '\n';
