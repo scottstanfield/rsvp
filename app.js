@@ -1,17 +1,25 @@
 (function(){
-    "use strict";
+    'use strict';
 
     var express = require('express');
     var http = require('http');
-    var util = require('util');
     var moment = require('moment');
-    var _ = require('underscore');
+//var _ = require('underscore');
+    var redis = require('then-redis');
+    var expressValidator = require('express-validator');
 
     // var SendGrid = require('sendgrid').SendGrid;
     var sendgrid = {};
 
-    var redis = require('then-redis');
-    var expressValidator = require('express-validator');
+    var withRedis = function(onRedisConnect, res) {
+        var redisport = process.env.REDISTOGO_URL || 'tcp://127.0.0.1:6379';
+        redis.connect(redisport).then(function(db) {
+            onRedisConnect(db);
+        }, function (error) {
+            console.log('Failed to conenct to Redis: ' + error);
+            res.render('500', { error: error });
+        });
+    };
 
     var redisport = 0;
 
@@ -19,10 +27,7 @@
     app.configure(function() {
         app.set('port', process.env.PORT || 3000);
 
-        redisport = process.env.REDISTOGO_URL || 'tcp://127.0.0.1:6379';
-        app.set('redis-port', redisport);
-
-        app.set('views', __dirname + '/views');   // nomrally __dirname + "/views");
+        app.set('views', __dirname + '/views');   // nomrally __dirname + '/views");
         app.set('view engine', 'jade');
 
         app.use(express.favicon());
@@ -189,13 +194,14 @@
 
     app.get('/initdb', function(req, res) {
         console.log('redis port:' + app.get('redis-port'));
-
-        redis.connect(app.get('redis-port')).then(function (db) {
+        
+        withRedis(function(db, res){
             db.set('rsvp:rds',  50);
             db.set('rsvp:mvps', 20);
             db.set('rsvp:devexpress', 6);
+
+            res.send('initdb');
         });
-        res.send('initdb');
     });
 
     app.get('/readdb', function(req, res) {
@@ -220,13 +226,10 @@
         var field = req.params.field;       
         var value = req.params.value;       
 
-        redis.connect(redisport).then(function(db) {
+        withRedis(function(db, res){
             db.hset(key, field, value).then(function(result) {
                 res.send(result);
             });
-        }, function (error) {
-            console.log('Failed to conenct to Redis: ' + error);
-            res.render('500', { error: error });
         });
     });
 
@@ -234,13 +237,10 @@
         var key = req.params.key;       
         console.log('deleting: ' + key);
 
-        redis.connect(redisport).then(function(db) {
+        withRedis(function(db, res){
             db.del(key).then(function(result) {
                 res.send(result);
             });
-        }, function (error) {
-            console.log('Failed to conenct to Redis: ' + error);
-            res.render('500', { error: error });
         });
     });
 
@@ -249,28 +249,20 @@
         var key = req.params.key;       // skipping validity checks
         console.log(key);
 
-        redis.connect(redisport).then(function(db) {
-            db.hgetall(key).then(function(hash) {
+        withRedis(function(db, res){
+             db.hgetall(key).then(function(hash) {
                 res.send(hash);
             });
-        }, function (error) {
-            console.log('Failed to conenct to Redis: ' + error);
-            // res.send(500);
-            res.render('500', { error: error });
         });
+ 
     });
 
     app.get('/readhash2', function(req, res) {
-        redis.connect(redisport).then(function(db) {
+        withRedis(function(db, res){
             db.hgetall('rsvp').then(function(hash) {
                 res.send(hash);
             });
-        }, function (error) {
-            console.log('Failed to conenct to Redis: ' + error);
-            // res.send(500);
-            res.render('500', { error: error });
         });
-
     });
 
     app.get('/readhash3', function(req, res) {
@@ -279,33 +271,9 @@
         });
     });
 
-    app.get('/oldreaddb', function(req, res) {
-        console.log('redis port:' + app.get('redis-port'));
-
-        var buckets = {};
-
-        redis.connect(app.get('redis-port')).then(function(db) {
-            console.log('about to do DB query');
-            db.keys('rsvp:*').then(function(keys) {
-                db.send('mget', keys).then(function(reply) {
-                    _.map(keys, function(k) {
-                        db.get(k).then(function(v) {
-                            console.log(k + ':' + v);
-                            buckets.k = v;
-                        });
-                    });
-                });
-            });
-            return buckets;
-        }).then(function(values) {
-            console.log('finished DB query');
-            res.send(buckets);
-        });
-    });
-
     app.get('/debug', function(req, res) {
 
-        redis.connect(app.get('redis-port')).then(function (db) {
+        withRedis(function(db, res){
             db.get('rsvp:rds').then(function(value) {
                 var answer = '';
                 answer += 'Your IP: ' + req.ip + '\n';
@@ -321,9 +289,6 @@
 
                 res.end(answer);
             });
-        }, function (error) {
-                console.log('connection REDIS ERROR: ' + error);
-                res.end('redis connection error');
         });
     });
 
