@@ -10,7 +10,6 @@ var redis = require('then-redis');
 var expressValidator = require('express-validator');
 
 var app = express();
-
 // MIDDLEWARE
 //
 app.configure(function() {
@@ -141,7 +140,7 @@ app.get('/readdb', function(req, res) {
     });
 });
 
-app.get('/hash', function(req, res) {
+app.get('/readhash', function(req, res) {
     var db = redis.createClient(app.get('redis-port'));
 
     db.hgetall('buckets').then(function(hash) {
@@ -149,6 +148,25 @@ app.get('/hash', function(req, res) {
     });
 });
 
+app.get('/readhash2', function(req, res) {
+    var port = app.get('redis-port');
+    redis.connect(port).then(function(db) {
+        db.hgetall('buckets').then(function(hash) {
+            res.send(hash);
+        });
+    }, function (error) {
+        console.log('Failed to conenct to Redis: ' + error);
+        // res.send(500);
+        res.render('500', { error: error });
+    });
+
+});
+
+app.get('/readhash3', function(req, res) {
+    db.hgetall('buckets').then(function(hash) {
+        res.send(hash);
+    });
+});
 
 app.get('/oldreaddb', function(req, res) {
     console.log('redis port:' + app.get('redis-port'));
