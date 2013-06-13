@@ -75,12 +75,6 @@
         };
     }
 
-    app.get('/test', function(req, res) {
-        alertbox(res, Alert.success, 'hello there message', ['one', 'two']);
-        res.locals.errorText = 'hello from messages';
-        res.render('test');
-    });
-
     app.post('/', function(req, res) {
         req.checkBody('fullname', 'Name is required').notEmpty();
         req.checkBody('email', 'A valid email is required').isEmail();
@@ -163,7 +157,7 @@
     // LAUNCH THE SERVER
     // 
     http.createServer(app).listen(app.get('port'), function(){
-    console.log('Express server listening on port ' + app.get('port'));
+        console.log('Express server listening on port ' + app.get('port'));
     });
 
 })();
