@@ -85,13 +85,14 @@
         var fullname = res.locals.fullname = req.body.fullname;
         var email = res.locals.email = req.body.email;
         var code = res.locals.code = req.body.code;
+        
         var renderMsg = function(alertType, msg){
             alertbox(res, alertType, msg);
             res.render('index');
         }
 
         var reallyBadError = function(){
-            renderMsg(Alert.error, "Something really wrong happened :(");
+            renderMsg(Alert.error, "Something not so pleasant just happened. :(");
         }
 
         // two keys:
