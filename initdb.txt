@@ -1,0 +1,4 @@
+hgetall rsvp
+del rsvp
+hmset rsvp rds 50 mvps 20 vertigo 10 devexp 10
+hgetall rsvp

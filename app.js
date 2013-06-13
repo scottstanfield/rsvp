@@ -1,250 +1,362 @@
-var express = require('express');
-var http = require('http');
-var util = require('util');
-var moment = require('moment');
-var _ = require('underscore');
+(function(){
+    "use strict";
 
-// var SendGrid = require('sendgrid').SendGrid;
+    var express = require('express');
+    var http = require('http');
+    var util = require('util');
+    var moment = require('moment');
+    var _ = require('underscore');
 
-var redis = require('then-redis');
-var expressValidator = require('express-validator');
+    // var SendGrid = require('sendgrid').SendGrid;
+    var sendgrid = {};
 
-var app = express();
-// MIDDLEWARE
-//
-app.configure(function() {
-    app.set('port', process.env.PORT || 3000);
+    var redis = require('then-redis');
+    var expressValidator = require('express-validator');
 
-    app.set('redis-port', process.env.REDISTOGO_URL || 'tcp://127.0.0.1:6379');
+    var redisport = 0;
 
-    app.set('views', __dirname + '/views');   // nomrally __dirname + "/views");
-    app.set('view engine', 'jade');
+    var app = express();
+    app.configure(function() {
+        app.set('port', process.env.PORT || 3000);
 
-    app.use(express.favicon());
-    app.use(express.logger('dev'));
-    app.use(express.compress());
-    app.use(express.bodyParser());      // json, urlencode and multipart forms
+        redisport = process.env.REDISTOGO_URL || 'tcp://127.0.0.1:6379';
+        app.set('redis-port', redisport);
 
-    var options = {};
-    app.use(expressValidator(options));
+        app.set('views', __dirname + '/views');   // nomrally __dirname + "/views");
+        app.set('view engine', 'jade');
 
-    app.use(express.methodOverride());
-    app.use(express.static(__dirname + '/static'));
+        app.use(express.favicon());
+        app.use(express.logger('dev'));
+        app.use(express.compress());
+        app.use(express.bodyParser());      // json, urlencode and multipart forms
 
-    app.use(app.router);
+        var options = {};
+        app.use(expressValidator(options));
 
-    app.use(myErrorHandler);
-});
+        app.use(express.methodOverride());
+        app.use(express.static(__dirname + '/static'));
 
-app.configure('development', function() {
-    app.locals.pretty = true;           // jade will render nice HTML
-    sendgrid = {
-        send: function(opts, cb) {
-            console.log('Email:', opts);
-            cb(true, opts);
-        }
-    };
-});
+        app.use(app.router);
 
-app.configure('production', function() {
-    console.log('in production mode');
-    app.use(express.errorHandler());
-    // sendgrid = new SendGrid(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
-});
-
-// app.locals is new in Express 3. Pre-initialize errors and message for use later.
-app.locals.errors = {};
-app.locals.message = {};
-
-function sendEmail(message, fn) {
-    sendgrid.send( {
-        to: process.env.EMAIL_RECIPIENT,
-        from: message.email,
-        subject: 'Contact message',
-        text: message.message
-    }, fn);
-}
-
-// ROUTES
-//
-app.get('/', function(req, res) {
-    res.render('index', {
-        text: moment().format('dddd h:mm:ss a')
+        app.use(myErrorHandler);
     });
-});
 
-var Alert = { success: 'success', info: 'info', warning: 'warning', error: 'error' };
+    app.configure('development', function() {
+        app.locals.pretty = true;           // jade will render nice HTML
+        sendgrid = {
+            send: function(opts, cb) {
+                console.log('Email:', opts);
+                cb(true, opts);
+            }
+        };
+    });
 
-function alertbox(res, a, m, e)
-{
-    var e = e || [];
-    res.locals.alerts = {
-        style: a,           // pick one from Alert
-        msg: m,
-        errors: e
-    };
-}
+    app.configure('production', function() {
+        console.log('in production mode');
+        app.use(express.errorHandler());
+        // sendgrid = new SendGrid(process.env.SENDGRID_USERNAME, process.env.SENDGRID_PASSWORD);
+    });
 
-app.get('/test', function(req, res) {
-    alertbox(res, Alert.success, 'hello there message', ['one', 'two']);
-    res.locals.errorText = 'hello from messages';
-    res.render('test');
-});
+    // app.locals is new in Express 3. Pre-initialize errors and message for use later.
+    app.locals.errors = {};
+    app.locals.message = {};
 
-app.post('/rsvp', function(req, res) {
-    req.checkBody('fullname', 'Name is required').notEmpty();
-    req.checkBody('email', 'A valid email is required').isEmail();
-    req.checkBody('code', 'An RSVP code is required').notEmpty();
-
-    var errors = req.validationErrors();
-
-    if (!errors) {
-        alertbox(res, Alert.success, 'Your code is valid. Thanks for RSVPing!');
-    } else {
-        var e = _.map(errors, function(n) { return n.msg; });
-        alertbox(res, Alert.error, 'Please correct the following:', e);
+    function sendEmail(message, fn) {
+        sendgrid.send( {
+            to: process.env.EMAIL_RECIPIENT,
+            from: message.email,
+            subject: 'Contact message',
+            text: message.message
+        }, fn);
     }
 
-    res.locals.fullname = req.body.fullname;
-    res.locals.code = req.body.code;
-    res.locals.email = req.body.email;
-
-    res.render('index');
-});
-
-app.get('/rsvp', function(req, res) {
-    res.redirect('/');
-});
-
-
-// debug
-
-app.get('/initdb', function(req, res) {
-    console.log('redis port:' + app.get('redis-port'));
-
-    redis.connect(app.get('redis-port')).then(function (db) {
-        db.set('rsvp:rds',  50);
-        db.set('rsvp:mvps', 20);
-        db.set('rsvp:devexpress', 6);
+    // ROUTES
+    //
+    app.get('/', function(req, res) {
+        res.render('index', {
+            text: moment().format('dddd h:mm:ss a')
+        });
     });
-    res.send('initdb');
-});
 
-app.get('/readdb', function(req, res) {
-    var db = redis.createClient(app.get('redis-port'));
+    var Alert = { success: 'success', info: 'info', warning: 'warning', error: 'error' };
 
-    db.keys('rsvp:*').then(function(keys) {
-        return db.send('mget', keys);
-    }).then(function(values) {
-        res.send(values);
+    function alertbox(res, a, m, e)
+    {
+        var e = e || [];
+        res.locals.alerts = {
+            style: a,           // pick one from Alert
+            msg: m,
+            errors: e
+        };
+    }
+
+    app.get('/test', function(req, res) {
+        alertbox(res, Alert.success, 'hello there message', ['one', 'two']);
+        res.locals.errorText = 'hello from messages';
+        res.render('test');
     });
-});
 
-app.get('/readhash', function(req, res) {
-    var db = redis.createClient(app.get('redis-port'));
+    // app.post('/rsvp', function(req, res) {
+    //     req.checkBody('fullname', 'Name is required').notEmpty();
+    //     req.checkBody('email', 'A valid email is required').isEmail();
+    //     req.checkBody('code', 'An RSVP code is required').notEmpty();
 
-    db.hgetall('buckets').then(function(hash) {
-       res.send(hash);
+    //     var errors = req.validationErrors();
+
+    //     res.locals.fullname = req.body.fullname;
+    //     res.locals.code = req.body.code;
+    //     res.locals.email = req.body.email;
+
+    //     if (!errors) {
+
+    //         function doSomeStuffWithRsvps(rsvps) {
+
+    //             // if to see if users already rsvp'd
+    //             //      redirect to already registered page
+    //             //
+    //             // if rsvp code not correct
+    //             //      redirect to incorrect code page
+    //             // 
+    //             // all seems good - save the data
+    //             // redirect to successfully rsvp'd page.
+    //             //
+    //             //
+    //         }
+
+    //         var getRsvps = function (callback, errorCallback) {
+    //             var port = app.get('redis-port');
+
+    //             redis.connect(port).then(function(db) {
+
+    //                 db.hgetall('rsvps').then(function(hash) {
+    //                     // if buckets doesn't exist
+    //                     if(!Object.keys(hash).length) {
+    //                         db.hmset('rsvps', {
+    //                             'rds': 50,
+    //                             'mvps': 20,
+    //                             'msft': 30,
+    //                             'devexpress': 10,
+    //                             'preempt': 15,
+    //                             'vertigo': 10
+    //                         }).then(function(){
+
+    //                             db.hgetall('rsvps').then(function(hash) {
+    //                                 callback(hash);
+    //                             }, function(){
+    //                                 errorCallback('Could not create and load rsvps');
+    //                             });
+    //                         }, function(){
+    //                             console.log('error hmset(\'rsvps\'');
+    //                             console.log(arguments);
+    //                             errorCallback('Could not create and load rsvps');
+    //                         });
+    //                     }
+    //                     else {
+    //                         doSomeStuffWithRsvps(hash);
+    //                     }
+    //                 });
+    //             }, function (error) {
+    //                 console.log('Failed to conenct to Redis: ' + error);
+    //                 // res.send(500);
+    //                 res.render('500', { error: error });
+    //                 return;
+    //             });
+    //         };
+
+    //         getRsvps(function(rsvps){
+    //             doSomeStuffWithRsvps(rsvps);
+    //         }, function(err) {
+    //             //todo handle error???
+    //         });
+
+    //         alertbox(res, Alert.success, 'Your code is valid. Thanks for RSVPing!');
+
+    //         return;
+    //     } else {
+    //         var e = _.map(errors, function(n) { return n.msg; });
+    //         alertbox(res, Alert.error, 'Please correct the following:', e);
+    //     }
+
+    //     res.render('index');
+    // });
+
+    app.get('/rsvp', function(req, res) {
+        res.redirect('/');
     });
-});
 
-app.get('/readhash2', function(req, res) {
-    var port = app.get('redis-port');
-    redis.connect(port).then(function(db) {
+
+    // REDIS manipulation functions
+
+    app.get('/initdb', function(req, res) {
+        console.log('redis port:' + app.get('redis-port'));
+
+        redis.connect(app.get('redis-port')).then(function (db) {
+            db.set('rsvp:rds',  50);
+            db.set('rsvp:mvps', 20);
+            db.set('rsvp:devexpress', 6);
+        });
+        res.send('initdb');
+    });
+
+    app.get('/readdb', function(req, res) {
+        var db = redis.createClient(app.get('redis-port'));
+
+        db.keys('rsvp:*').then(function(keys) {
+            return db.send('mget', keys);
+        }).then(function(values) {
+            res.send(values);
+        });
+    });
+
+    // not working
+    app.get('/hash', function(req, res) {
+        // default to the 'rsvp' key
+        res.redirect('/hash/rsvp');
+    });
+
+
+    app.post('/hash/:key/:field/:value', function(req, res) {
+        var key = req.params.key;       
+        var field = req.params.field;       
+        var value = req.params.value;       
+
+        redis.connect(redisport).then(function(db) {
+            db.hset(key, field, value).then(function(result) {
+                res.send(result);
+            });
+        }, function (error) {
+            console.log('Failed to conenct to Redis: ' + error);
+            res.render('500', { error: error });
+        });
+    });
+
+    app.delete('/hash/:key', function(req, res) {
+        var key = req.params.key;       
+        console.log('deleting: ' + key);
+
+        redis.connect(redisport).then(function(db) {
+            db.del(key).then(function(result) {
+                res.send(result);
+            });
+        }, function (error) {
+            console.log('Failed to conenct to Redis: ' + error);
+            res.render('500', { error: error });
+        });
+    });
+
+    app.get('/hash/:key', function(req, res) {
+        console.log('using REDIS:' + redisport);
+        var key = req.params.key;       // skipping validity checks
+        console.log(key);
+
+        redis.connect(redisport).then(function(db) {
+            db.hgetall(key).then(function(hash) {
+                res.send(hash);
+            });
+        }, function (error) {
+            console.log('Failed to conenct to Redis: ' + error);
+            // res.send(500);
+            res.render('500', { error: error });
+        });
+    });
+
+    app.get('/readhash2', function(req, res) {
+        redis.connect(redisport).then(function(db) {
+            db.hgetall('rsvp').then(function(hash) {
+                res.send(hash);
+            });
+        }, function (error) {
+            console.log('Failed to conenct to Redis: ' + error);
+            // res.send(500);
+            res.render('500', { error: error });
+        });
+
+    });
+
+    app.get('/readhash3', function(req, res) {
         db.hgetall('buckets').then(function(hash) {
             res.send(hash);
         });
-    }, function (error) {
-        console.log('Failed to conenct to Redis: ' + error);
-        // res.send(500);
-        res.render('500', { error: error });
     });
 
-});
+    app.get('/oldreaddb', function(req, res) {
+        console.log('redis port:' + app.get('redis-port'));
 
-app.get('/readhash3', function(req, res) {
-    db.hgetall('buckets').then(function(hash) {
-        res.send(hash);
-    });
-});
+        var buckets = {};
 
-app.get('/oldreaddb', function(req, res) {
-    console.log('redis port:' + app.get('redis-port'));
-
-    var buckets = {};
-
-    redis.connect(app.get('redis-port')).then(function(db) {
-        console.log('about to do DB query');
-        db.keys('rsvp:*').then(function(keys) {
-            db.send('mget', keys).then(function(reply) {
-                _.map(keys, function(k) {
-                    db.get(k).then(function(v) {
-                        console.log(k + ':' + v);
-                        buckets.k = v;
+        redis.connect(app.get('redis-port')).then(function(db) {
+            console.log('about to do DB query');
+            db.keys('rsvp:*').then(function(keys) {
+                db.send('mget', keys).then(function(reply) {
+                    _.map(keys, function(k) {
+                        db.get(k).then(function(v) {
+                            console.log(k + ':' + v);
+                            buckets.k = v;
+                        });
                     });
                 });
             });
+            return buckets;
+        }).then(function(values) {
+            console.log('finished DB query');
+            res.send(buckets);
         });
-        return buckets;
-    }).then(function(values) {
-        console.log('finished DB query');
-        res.send(buckets);
     });
-});
 
-app.get('/debug', function(req, res) {
+    app.get('/debug', function(req, res) {
 
-    redis.connect(app.get('redis-port')).then(function (db) {
-        db.get('rsvp:rds').then(function(value) {
-            var answer = '';
-            answer += 'Your IP: ' + req.ip + '\n';
-            answer += 'Request URL: ' + req.url + '\n';
-            answer += 'Request type: ' + req.method + '\n';
-            // answer += 'Request headers: ' + JSON.stringify(req.headers) + '\n';
-            //
+        redis.connect(app.get('redis-port')).then(function (db) {
+            db.get('rsvp:rds').then(function(value) {
+                var answer = '';
+                answer += 'Your IP: ' + req.ip + '\n';
+                answer += 'Request URL: ' + req.url + '\n';
+                answer += 'Request type: ' + req.method + '\n';
+                // answer += 'Request headers: ' + JSON.stringify(req.headers) + '\n';
+                //
 
-            if (value <= 0)
-                answer += 'redis: no more invites left ' + value.toString();
-            else
-                answer += 'redis: ' + value.toString();
+                if (value <= 0)
+                    answer += 'redis: no more invites left ' + value.toString();
+                else
+                    answer += 'redis: ' + value.toString();
 
-            res.end(answer);
+                res.end(answer);
+            });
+        }, function (error) {
+                console.log('connection REDIS ERROR: ' + error);
+                res.end('redis connection error');
         });
-    }, function (error) {
-            console.log('connection REDIS ERROR: ' + error);
-            res.end('redis connection error');
     });
-});
 
-app.get('/about', function(req, res) {
-    res.end('About us');
-});
+    app.get('/about', function(req, res) {
+        res.end('About us');
+    });
 
-app.get('/hello/:who', function(req, res) {
-    res.end('Hello there, ' + req.params.who + '.');
-});
+    app.get('/hello/:who', function(req, res) {
+        res.end('Hello there, ' + req.params.who + '.');
+    });
 
-app.get('/error', function(req, res) {
-    res.render('500', { error: req });
-});
+    app.get('/error', function(req, res) {
+        res.render('500', { error: req });
+    });
 
-// since this is the last non-error-handling middle use()'d,
-// we assume it's a 404, as nothing else repsonded
+    // since this is the last non-error-handling middle use()'d,
+    // we assume it's a 404, as nothing else repsonded
 
-app.get('*', function(req, res) {
-    res.status(404).end('Page not found.');
-});
+    app.get('*', function(req, res) {
+        res.status(404).end('Page not found.');
+    });
 
-// ERROR HANDLING
-//
-function myErrorHandler(err, req, res, next) {
-    console.error(err.stack);
-    res.status(500).render('500', { error: err });
-}
+    // ERROR HANDLING
+    //
+    function myErrorHandler(err, req, res, next) {
+        console.error(err.stack);
+        res.status(500).render('500', { error: err });
+    }
 
-// LAUNCH THE SERVER
-// 
-http.createServer(app).listen(app.get('port'), function(){
-  console.log('Express server listening on port ' + app.get('port'));
-});
+    // LAUNCH THE SERVER
+    // 
+    http.createServer(app).listen(app.get('port'), function(){
+    console.log('Express server listening on port ' + app.get('port'));
+    });
 
+})();
