@@ -1,24 +1,28 @@
 extends layout
 block content
-  h2 RSVP
+  h2 RSVP for the Stanfield's RD Party
+  p Here is some body text, set in Georgia.
 
   include alerts
 
-  form(action='/', method='post').form-horizontal
-    .control-group
-      label.control-label(for='name' ) Your Name
-      .controls
-        input#message_name.input-xxlarge(type='text', placeholder='Name', name='fullname', value=fullname)
+  div.well
 
-    .control-group
-      label.control-label(for='email') Email
-      .controls
-        input#message_email.input-xxlarge(type='text', placeholder='Email', name='email', value=email)
+    form(action='/', method='post').form-horizontal
+      .control-group
+        label.control-label(for='name' ) Your Name
+        .controls
+          input#message_name.input-xxlarge(type='text', placeholder='Name', name='fullname', value=fullname)
 
-    .control-group
-      label.control-label(for='code') RSVP Code
-      .controls
-        input#message_message.input-xxlarge(type='RSVP Code', placeholder='RSVP', name='code', value=code)
+      .control-group
+        label.control-label(for='email') Email
+        .controls
+          input#message_email.input-xxlarge(type='text', placeholder='Email', name='email', value=email)
 
-    button.btn(type='submit') RSVP
-    h2= text
+      .control-group
+        label.control-label(for='code') RSVP Code
+        .controls
+          input#message_message.input-xxlarge(type='RSVP Code', placeholder='RSVP', name='code', value=code)
+
+      button.btn.btn-primary(type='submit') RSVP
+
+    h3= text

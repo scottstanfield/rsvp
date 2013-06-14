@@ -35,6 +35,8 @@
         app.use(expressValidator(options));
 
         app.use(express.methodOverride());
+
+        app.use(require('stylus').middleware(__dirname + '/static'));
         app.use(express.static(__dirname + '/static'));
 
         app.use(app.router);
