@@ -86,7 +86,7 @@
 
         var fullname = res.locals.fullname = req.body.fullname;
         var email = res.locals.email = req.body.email;
-        var code = res.locals.code = req.body.code;
+        var code = res.locals.code = (req.body.code || '').toLowerCase();
         
         var renderMsg = function(alertType, msg){
             alertbox(res, alertType, msg);
