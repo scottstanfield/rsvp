@@ -12,7 +12,8 @@
     "then-redis": "~0.3.8",
     "express-validator": "https://github.com/ctavan/express-validator/tarball/master",
     "moment": "~2.0.0",
-    "underscore": "~1.4.4"
+    "underscore": "~1.4.4",
+    "async": "~0.2.9"
   },
   "engines": {
     "node": "0.10.*"

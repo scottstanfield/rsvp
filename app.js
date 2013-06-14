@@ -6,11 +6,20 @@
     var moment = require('moment');
     var redis = require('then-redis');
     var expressValidator = require('express-validator');
+    var async = require('async');
 
     var withRedis = function(res, onRedisConnect) {
         var redisport = process.env.REDISTOGO_URL || 'tcp://127.0.0.1:6379';
+
         redis.connect(redisport).then(function(db) {
-            onRedisConnect(db);
+            async.series([
+                function(callback) {
+                    onRedisConnect(db);
+                },
+                function(callback) {
+                    db.quit(); 
+                }
+            ]);
         }, function (error) {
             console.log('Failed to conenct to Redis: ' + error);
             res.render('500', { error: error });
@@ -140,7 +149,6 @@
 
     app.get('/hash/:key', function(req, res) {
         var key = req.params.key;       // skipping validity checks
-        console.log(key);
 
         withRedis(res, function(db){
              db.hgetall(key).then(function(hash) {
