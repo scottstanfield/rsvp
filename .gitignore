@@ -1,3 +1,5 @@
 node_modules
 .env
 static/css/custom.css
+init-db.txt
+read-db.txt
