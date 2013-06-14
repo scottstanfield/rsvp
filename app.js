@@ -138,6 +138,18 @@
         });
     });
 
+    app.get('/hash/:key', function(req, res) {
+        var key = req.params.key;       // skipping validity checks
+        console.log(key);
+
+        withRedis(res, function(db){
+             db.hgetall(key).then(function(hash) {
+                res.send(hash);
+            });
+        });
+ 
+    });
+
     app.get('/error', function(req, res) {
         res.render('500', { error: req });
     });
@@ -147,6 +159,16 @@
 
     app.get('*', function(req, res) {
         res.status(404).end('Page not found.');
+    });
+
+    app.get('/hash/:key', function(req, res) {
+        var key = req.params.key;       // skipping validity checks
+
+        withRedis(res, function(db){
+             db.hgetall(key).then(function(hash) {
+                res.send(hash);
+            });
+        });
     });
 
     // ERROR HANDLING
