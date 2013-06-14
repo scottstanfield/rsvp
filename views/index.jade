@@ -1,28 +1,39 @@
 extends layout
 block content
-  h2 RSVP for the Stanfield's RD Party
-  p Here is some body text, set in Georgia.
 
-  include alerts
+  div.container
+    header.well
+      h2 InterFax - Responsive One Page theme
+      p This is a bootstrap responsive theme
 
-  div.well
+    section.well
+      include alerts
 
-    form(action='/', method='post').form-horizontal
-      .control-group
-        label.control-label(for='name' ) Your Name
-        .controls
-          input#message_name.input-xlarge(type='text', placeholder='Name', name='fullname', value=fullname)
+      div
+        form(action='/', method='post').form-horizontal
+          .control-group
+            label.control-label(for='name' ) Your Name
+            .controls
+              input#message_name.input-xlarge(type='text', placeholder='Name', name='fullname', value=fullname)
 
-      .control-group
-        label.control-label(for='email') Email
-        .controls
-          input#message_email.input-xlarge(type='text', placeholder='Email', name='email', value=email)
+          .control-group
+            label.control-label(for='email') Email
+            .controls
+              input#message_email.input-xlarge(type='text', placeholder='Email', name='email', value=email)
 
-      .control-group
-        label.control-label(for='code') RSVP Code
-        .controls
-          input#message_message.input-xlarge(type='RSVP Code', placeholder='RSVP', name='code', value=code)
+          .control-group
+            label.control-label(for='code') RSVP Code
+            .controls
+              input#message_message.input-xlarge(type='RSVP Code', placeholder='RSVP', name='code', value=code)
 
-      button.btn.btn-primary(type='submit') RSVP
+          button.btn.btn-primary(type='submit') RSVP
+
+     p RSVP form goes here
+
+    section.well
+      p driving directions here
+
+      h2 RSVP for the Stanfield's RD Party
+      p Here is some body text, set in Georgia.
 
     h3= text
