@@ -9,10 +9,10 @@
     "jade": "*",
     "stylus": "~0.32.1",
     "connect": "~2.7.11",
-    "then-redis": "~0.3.8",
     "express-validator": "https://github.com/ctavan/express-validator/tarball/master",
     "moment": "~2.0.0",
-    "underscore": "~1.4.4"
+    "underscore": "~1.4.4",
+    "redis": "~0.8.3"
   },
   "engines": {
     "node": "0.10.*"

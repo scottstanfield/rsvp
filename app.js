@@ -4,20 +4,23 @@
     var express = require('express');
     var http = require('http');
     var moment = require('moment');
-    var redis = require('then-redis');
+    var redis = require('redis');
+    var url = require('url');
     var expressValidator = require('express-validator');
 
-    var withRedis = function(res, onRedisConnect) {
-        var redisport = process.env.REDISTOGO_URL || 'tcp://127.0.0.1:6379';
-        redis.connect(redisport).then(function(db) {
-            onRedisConnect(db);
-        }, function (error) {
-            console.log('Failed to conenct to Redis: ' + error);
-            res.render('500', { error: error });
-        });
-    };
+    var genericErrorMsg = "bummer, an error occured";
+    
 
-    var redisport = 0;
+    // setup redis
+    var parsedUrl = url.parse(process.env.REDISTOGO_URL || 'tcp://127.0.0.1:6379');
+    var client = redis.createClient(parsedUrl.port, parsedUrl.hostname);
+    client.auth(parsedUrl.password, function(err) {
+        console.log(err);
+    });
+    client.on("error", function (err) {
+        console.log("Error " + err);
+    });
+
 
     var app = express();
     app.configure(function() {
@@ -88,15 +91,6 @@
         var email = res.locals.email = req.body.email;
         var code = res.locals.code = (req.body.code || '').toLowerCase();
         
-        var renderMsg = function(alertType, msg){
-            alertbox(res, alertType, msg);
-            res.render('index');
-        }
-
-        var reallyBadError = function(){
-            renderMsg(Alert.error, "Something not so pleasant just happened. :(");
-        }
-
         // two keys:
         // 'codes' holds the available tickets like 'rds' or 'mvps'
         // 'rsvp'  holds the people that have RSVPd
@@ -107,47 +101,74 @@
             return res.render('index');
         }
         
-        withRedis(res, function(db) {
+        var renderMsg = function(alertType, msg){
+            alertbox(res, alertType, msg);
+            res.render('index');
+        }
 
-            // check if user already rsvp'd
-            db.hexists('rsvp', email).then(function(alreadyRegistered) {
-                if(alreadyRegistered) {
-                    return renderMsg(Alert.info, 'You\'ve already registered, silly');
+        var reallyBadError = function(){
+            renderMsg(Alert.error, "Something not so pleasant just happened. :(");
+        }
+
+        // check if user already rsvp'd
+        client.hexists('rsvp', email, function(err, alreadyRegistered) {
+            if(err) {
+                console.log(err);
+                return renderMsg(Alert.error, genericErrorMsg);
+            }
+
+            if(alreadyRegistered) {
+                return renderMsg(Alert.info, 'You\'ve already registered, silly');
+            }
+
+            // check if the specific rsvp code exists
+            client.hexists('codes', code, function(err, codeIsGood) {
+                if(err) {
+                    console.log(err);
+                    return renderMsg(Alert.error, genericErrorMsg);
                 }
 
-                // check if the specific rsvp code exists
-                db.hexists('codes', code).then(function(codeIsGood) {
-                    if(!codeIsGood) {
-                        return renderMsg(Alert.error, 'That RSVP code is not valid.');
+                if(!codeIsGood) {
+                    return renderMsg(Alert.error, 'That RSVP code is not valid.');
+                }
+
+                // decrement the supplied code
+                client.hincrby('codes', code, -1, function(err, result) {
+                    if(err) {
+                        console.log(err);
+                        return renderMsg(Alert.error, genericErrorMsg);
                     }
 
-                    // decrement the supplied code
-                    db.hincrby('codes', code, -1).then(function(result) {
-                        if(result <= 0) {
-                            return renderMsg(Alert.warning, 'That RSVP code is no longer valid.');
+                    if(result <= 0) {
+                        return renderMsg(Alert.warning, 'That RSVP code is no longer valid.');
+                    }
+
+                    // successfully decremented and we have a valid partier
+                    // save the registered partier's name
+                    client.hset('rsvp', email, JSON.stringify({ name: fullname, code: code }), function(err){
+                        if(err) {
+                            console.log(err);
+                            return renderMsg(Alert.error, genericErrorMsg);
                         }
 
-                        // successfully decremented and we have a valid partier
-                        // save the registered partier's name
-                        db.hset('rsvp', email, JSON.stringify({ name: fullname, code: code })).then(function(){
-                            return renderMsg(Alert.success, 'Your code is valid. Thanks for RSVPing!');
-                        }, reallyBadError);
-                    }, reallyBadError);
-                }, reallyBadError);
-            }, reallyBadError);
+                        return renderMsg(Alert.success, 'Your code is valid. Thanks for RSVPing!');
+                    });
+                });
+            });
         });
     });
 
+    var count = 0;
     app.get('/hash/:key', function(req, res) {
         var key = req.params.key;       // skipping validity checks
-        console.log(key);
+//        console.log(key);
+//        console.log(++count);
 
-        withRedis(res, function(db){
-             db.hgetall(key).then(function(hash) {
-                res.send(hash);
-            });
+
+        client.hgetall(key, function(err, hash) {
+            res.send(hash);
         });
- 
+
     });
 
     app.get('/error', function(req, res) {
@@ -159,16 +180,6 @@
 
     app.get('*', function(req, res) {
         res.status(404).end('Page not found.');
-    });
-
-    app.get('/hash/:key', function(req, res) {
-        var key = req.params.key;       // skipping validity checks
-
-        withRedis(res, function(db){
-             db.hgetall(key).then(function(hash) {
-                res.send(hash);
-            });
-        });
     });
 
     // ERROR HANDLING
