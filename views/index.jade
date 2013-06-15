@@ -11,45 +11,97 @@ block content
     p &nbsp;
 
     section.well
-      div.padded
-        include alerts
+
+      div.row-fluid
+        h3.centered RSVP
+
+      div.row-fluid
+        div.span12
+          include alerts
 
       div.row
-        div.container
-          div.span5
-            form(action='/', method='post').form-horizontal.padded-t
-              div.control-group
-                label.control-label(for='name') Name
-                div.controls
-                  input#message_name.input-xlarge(type='text', placeholder='Name', name='fullname', value=fullname)
+        div.span5
+          form#rsvpform(action='/', method='post').form-horizontal
+            div.control-group
+              label.control-label(for='name') Full Name
+              div.controls
+                input#message_name.input-xlarge(type='text', placeholder='Name', name='fullname', value=fullname)
 
-              div.control-group
-                label.control-label(for='email') Email
-                div.controls
-                  input#message_email.input-xlarge(type='text', placeholder='Email', name='email', value=email)
+            div.control-group
+              label.control-label(for='email') Email&dagger;
+              div.controls
+                input#message_email.input-xlarge(type='text', placeholder='Email', name='email', value=email)
 
-              div.control-group
-                label.control-label(for='code') Code
-                div.controls
-                  input#message_message.input-xlarge(type='text', placeholder='RSVP', name='code', value=code)
-              
-              div.control-group
-                label.control-label(for='submit')
-                div.controls
-                  button#submit.btn.btn-default(name='submit', type='submit') Submit
+            div.control-group
+              label.control-label(for='code') Code
+              div.controls
+                input#message_message.input-xlarge(type='text', placeholder='RSVP', name='code', value=code)
+            
+            div.control-group
+              label.control-label(for='submit')
+              div.controls
+                button#submit.btn.btn-large.btn-inverse(name='submit', type='submit') Submit
           
-          div.span6
-            div.padded
-              p Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur venenatis viverra sem eget consequat. Etiam lacinia, massa nec venenatis lobortis, mauris lacus rutrum ligula, ac placerat ante diam ac nibh. Integer eget dolor leo. Proin convallis est eros, molestie pulvinar velit vehicula consectetur. Nam sed cursus est. Donec purus quam, aliquet ac turpis in, blandit tempor eros. Mauris suscipit ornare diam ut sodales. Aliquam eget luctus nisl. Nulla eu purus quis enim ullamcorper malesuada.
+        div.span5.offset1
+          p Note this is a private, invitation&hyphen;only party. You should have received your RSVP code in email. 
+          p As there are a limited number of spaces available, RSVP early. No need to send your regrets if you can&rsquo;t make it.
+          p If you&rsquo;re having trouble with the form, <a href="mailto:scott@vertigo.com">send me a note</a>.
+          p &dagger;Your email won&rsquo;t be shared. We&rsquo;ll use it to communicate details about the party.
 
-    section.section-directions.padded-tb.well.well-nopadding  
+    p &nbsp;
+
+    section.well
+      div.row-fluid
+        div.span6.offset3
+            h2.centered How to Get Here
+
       div.row.padded-tb
         div.span10.offset1.transparent
           div.padded
-            p Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur venenatis viverra sem eget consequat. Etiam lacinia, massa nec venenatis lobortis, mauris lacus rutrum ligula, ac placerat ante diam ac nibh. Integer eget dolor leo. Proin convallis est eros, molestie pulvinar velit vehicula consectetur. Nam sed cursus est. Donec purus quam, aliquet ac turpis in, blandit tempor eros. Mauris suscipit ornare diam ut sodales. Aliquam eget luctus nisl. Nulla eu purus quis enim ullamcorper malesuada.
-            p Aenean tempus erat eget ligula euismod, a fringilla lectus condimentum. Donec in ligula in mi imperdiet fermentum eget at arcu. Donec tempor sollicitudin rutrum. Ut lectus dolor, fringilla id nisl vitae, imperdiet hendrerit orci. Ut venenatis ac diam eget pulvinar. Praesent rhoncus purus in tellus ultrices, a rutrum lectus luctus. Duis rhoncus, neque ut elementum porttitor, dolor diam adipiscing tortor, eu eleifend quam risus nec sem. Pellentesque quis viverra est, in blandit lectus. Nulla posuere rutrum rutrum. Vestibulum feugiat bibendum blandit. Phasellus in sem hendrerit odio aliquam aliquam et eget felis. Pellentesque varius condimentum libero fermentum ullamcorper. Mauris a est justo.
+            p If you're coming from the <a href='http://www.buildwindows.com'>BUILD conference</a> in San Francisco, your goal is to go from the circle to the star&hellip;using public transportation. 
+            img(src='/img/1909map-960.jpg')
+            p &nbsp;
+            p This is easy with our local subway: <a href='http://www.bart.gov', target='_blank'>BART</a>&Dagger;
+            ol
+              li Head to the POWELL street or MONTGOMERY street station (both on Market St)
+              li Purchase a $3.75 ticket (or $7.50 for round-trip)
+              li Catch a RICHMOND train (red line) to NORTH BERKELEY
+              li Exit and either wait for the our shuttle bus. Or just walk the four blocks.
+            p Here is the <a href="http://bit.ly/bart-jun26">exact schedule</a> you need.
+
       div.row.padded-b.pagination-centered
         div.span5.offset1.padded-t
-          img(src='/img/map.PNG')
+          h3 1) Take BART
+          img(src='/img/bart.png')
         div.span5.padded-t
-          img(src='/img/bart.PNG')
+          h3 2) Walk or Private Shuttle
+          img(src='/img/walking.png')
+     
+
+      div.row
+        div.span10.offset1
+          div.padded
+            h2.centered &sect;
+            small
+              p &Dagger;Use BART for several reasons:
+              div.row-fluid
+                span.span6
+                  ul
+                    li Driving the Bay Bridge during rush-hour is ill advised
+                    li The Conference is 1 block from Powell St Station 
+                    li My house is 4 blocks from North Berkeley station
+                span.span6
+                  ul
+                    li Very little on-street parking at my house
+                    li You can enjoy more adult beverages
+                    li <i>transport public est à la mode</i>
+
+    section.well
+      div.row-fluid
+        div.span6.offset3
+          h2.centered More Photos
+          blockquote 
+            p I like small parties. They're so intimate. At small parties there isn't any privacy.
+            small F. Scott Fitzgerald
+
+
