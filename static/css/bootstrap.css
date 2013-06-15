@@ -328,6 +328,8 @@ a:focus {
 
 .span4 {
   width: 300px;
+  margin-right: 160px;
+  margin-left: -10px;
 }
 
 .span3 {
@@ -6491,12 +6493,6 @@ div.subnav .nav > li.active > a:hover {
 .pagination ul > .disabled > span:hover {
   color: #555555;
   background-color: transparent;
-}
-
-.btn {
-  padding-top: .6em;
-  font-family: "Josefin Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-weight: bold;
 }
 
 legend {
