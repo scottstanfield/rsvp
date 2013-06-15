@@ -14,7 +14,7 @@
     // setup redis
     var parsedUrl = url.parse(process.env.REDISTOGO_URL || 'tcp://127.0.0.1:6379');
     var client = redis.createClient(parsedUrl.port, parsedUrl.hostname);
-    client.auth(parsedUrl.password, function(err) {
+    client.auth(parsedUrl.auth.split(":")[1], function(err) {
         console.log(err);
     });
     client.on("error", function (err) {
