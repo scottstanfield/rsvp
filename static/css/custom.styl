@@ -11,17 +11,20 @@ ul.errors
 header
     color #fefefe
 
-.wellx 
-    min-height  20px 
-    margin-bottom  20px 
-    background-color  #ffffff 
-    border  1px solid #ededed 
-    -webkit-border-radius  0 
-    -moz-border-radius  0 
-    border-radius  0 
-    -webkit-box-shadow  inset 0 1px 1px rgba(0, 0, 0, 0.05)
-    -moz-box-shadow  inset 0 1px 1px rgba(0, 0, 0, 0.05)
-    box-shadow  inset 0 1px 1px rgba(0, 0, 0, 0.05)
+.well-nopadding
+    padding 0
+
+// .wellx 
+//     min-height  20px 
+//     margin-bottom  20px 
+//     background-color  #ffffff 
+//     border  1px solid #ededed 
+//     -webkit-border-radius  0 
+//     -moz-border-radius  0 
+//     border-radius  0 
+//     -webkit-box-shadow  inset 0 1px 1px rgba(0, 0, 0, 0.05)
+//     -moz-box-shadow  inset 0 1px 1px rgba(0, 0, 0, 0.05)
+//     box-shadow  inset 0 1px 1px rgba(0, 0, 0, 0.05)
 
 .section-directions
     background url('/img/tile.png') repeat #b1d95c
@@ -38,3 +41,8 @@ header
 .padded
     padding 20px 30px
 
+// [class*="span"] {background: #EEF; }
+// [class*="span"] [class*="span"] {background: #FEE; }
+
+
+[class^="span"] {background-color: rgba(255, 0, 0, 0.3); }

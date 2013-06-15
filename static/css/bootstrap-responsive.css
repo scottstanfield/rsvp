@@ -159,8 +159,6 @@
   }
   .span4 {
     width: 370px;
-	margin-right: 100px;
-	margin-left: 50px;
   }
   .span3 {
     width: 270px;
@@ -504,14 +502,13 @@
     width: 414px;
   }
   .span6 {
-    width: 600px;
-	margin-left: 82px;
+    width: 352px;
   }
   .span5 {
     width: 290px;
   }
   .span4 {
-    width: 600px;
+    width: 228px;
   }
   .span3 {
     width: 166px;
@@ -807,7 +804,6 @@
     padding-right: 20px;
     padding-left: 20px;
   }
-
   .navbar-fixed-top,
   .navbar-fixed-bottom,
   .navbar-static-top {
@@ -858,7 +854,6 @@
        -moz-box-sizing: border-box;
             box-sizing: border-box;
   }
-  
   .row-fluid [class*="offset"]:first-child {
     margin-left: 0;
   }

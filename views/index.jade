@@ -2,44 +2,47 @@ extends layout
 block content
 
   div.container
-    header.wellx.heroimage
+    header.heroimage
       div.container
         div.row
           div.span8.offset2
             img(src='/img/invite.png')
 
-    section.wellx
+    p &nbsp;
+
+    section.well
       div.padded
         include alerts
 
-      div.row.padded-b
-        div.span4
-          form(action='/', method='post').form-horizontal.padded-t
-            div.control-group
-              label.control-label(for='name') Name
-              div.controls
-                input#message_name.input-xlarge(type='text', placeholder='Name', name='fullname', value=fullname)
+      div.row
+        div.container
+          div.span5
+            form(action='/', method='post').form-horizontal.padded-t
+              div.control-group
+                label.control-label(for='name') Name
+                div.controls
+                  input#message_name.input-xlarge(type='text', placeholder='Name', name='fullname', value=fullname)
 
-            div.control-group
-              label.control-label(for='email') Email
-              div.controls
-                input#message_email.input-xlarge(type='text', placeholder='Email', name='email', value=email)
+              div.control-group
+                label.control-label(for='email') Email
+                div.controls
+                  input#message_email.input-xlarge(type='text', placeholder='Email', name='email', value=email)
 
-            div.control-group
-              label.control-label(for='code') Code
-              div.controls
-                input#message_message.input-xlarge(type='text', placeholder='RSVP', name='code', value=code)
-            
-            div.control-group
-              label.control-label(for='submit')
-              div.controls
-                button#submit.btn.btn-default(name='submit', type='submit') Submit
+              div.control-group
+                label.control-label(for='code') Code
+                div.controls
+                  input#message_message.input-xlarge(type='text', placeholder='RSVP', name='code', value=code)
+              
+              div.control-group
+                label.control-label(for='submit')
+                div.controls
+                  button#submit.btn.btn-default(name='submit', type='submit') Submit
           
-        div.span6
-          div.padded
-            p Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur venenatis viverra sem eget consequat. Etiam lacinia, massa nec venenatis lobortis, mauris lacus rutrum ligula, ac placerat ante diam ac nibh. Integer eget dolor leo. Proin convallis est eros, molestie pulvinar velit vehicula consectetur. Nam sed cursus est. Donec purus quam, aliquet ac turpis in, blandit tempor eros. Mauris suscipit ornare diam ut sodales. Aliquam eget luctus nisl. Nulla eu purus quis enim ullamcorper malesuada.
+          div.span6
+            div.padded
+              p Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur venenatis viverra sem eget consequat. Etiam lacinia, massa nec venenatis lobortis, mauris lacus rutrum ligula, ac placerat ante diam ac nibh. Integer eget dolor leo. Proin convallis est eros, molestie pulvinar velit vehicula consectetur. Nam sed cursus est. Donec purus quam, aliquet ac turpis in, blandit tempor eros. Mauris suscipit ornare diam ut sodales. Aliquam eget luctus nisl. Nulla eu purus quis enim ullamcorper malesuada.
 
-    section.section-directions.padded-tb.wellx  
+    section.section-directions.padded-tb.well.well-nopadding  
       div.row.padded-tb
         div.span10.offset1.transparent
           div.padded
