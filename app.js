@@ -141,7 +141,7 @@
                         return renderMsg(Alert.error, genericErrorMsg);
                     }
 
-                    if(result <= 0) {
+                    if(result < 0) {
                         return renderMsg(Alert.warning, 'That RSVP code is no longer valid.');
                     }
 
