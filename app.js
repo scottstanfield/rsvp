@@ -120,7 +120,7 @@
             }
 
             if(alreadyRegistered) {
-                return renderMsg(Alert.info, 'You\'ve already registered, silly');
+                return renderMsg(Alert.info, 'You\'ve already registered, Silly.');
             }
 
             // check if the specific rsvp code exists
