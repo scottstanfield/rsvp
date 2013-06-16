@@ -1,15 +1,30 @@
-!!!
-html
+doctype 5
+//if lt IE 7
+    html.no-js.lt-ie9.lt-ie8.lt-ie7(lang='en')
+//if IE 7
+    html.no-js.lt-ie9.lt-ie8(lang='en')
+//if IE 8
+    html.no-js.lt-ie9(lang='en')
+//[if gt IE 8]><!
+html(lang='en')
+  //<![endif]
+    
   head
-    title RSVP
+    meta(charset='utf-8')
+    meta(http-equiv='X-UA-Compatible', content='IE=edge,chrome=1')
+    meta(name='description', content='')
+    meta(name='viewport', content='width=device-width')
+
+    title RD Party RSVP
     link(rel='stylesheet', href='/css/bootstrap.css')
     link(rel='stylesheet', href='/css/bootstrap-responsive.css')
     link(rel='stylesheet', href='/css/custom.css')
-  body
-    // .navbar
-    //   .navbar-inner
-    //     .container
-    //       a.brand(href='/') Contact Me
-    // .subnav
 
+  body
     block content
+
+    //if lt IE 7
+      p.chromeframe.
+        You are using an outdated browser.
+          <a href="http://browsehappy.com/">Update today</a>
+
