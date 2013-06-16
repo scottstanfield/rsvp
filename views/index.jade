@@ -4,7 +4,7 @@ block content
   div.container
     header.heroimage
       div.container
-        div.row
+        div.row-fluid
           div.span8.offset2
             img(src='/img/invite.png')
 
@@ -55,11 +55,12 @@ block content
         div.span6.offset3
             h1.centered How to Get Here
 
-      div.row.padded-tb
+      div.row-fluid
         div.span10.offset1.transparent
           div.padded
             p If you're coming from the <a href='http://www.buildwindows.com'>BUILD conference</a> in San Francisco, your goal is to go from the circle to the star&hellip;using public transportation. 
-            img(src='/img/1909map-960.jpg')
+            a(href='/img/1909map-960.jpg')
+              img(src='/img/1909map-960.jpg')
             p &nbsp;
             p This is easy with our local subway, <a href='http://www.bart.gov', target='_blank'>BART</a>&Dagger;
             ol
@@ -69,15 +70,15 @@ block content
               li Exit and either wait for the shuttle bus, or just walk the four blocks.
             p Here is the <a href="http://bit.ly/bart-jun26">exact schedule</a> you need.
 
-      div.row.padded-b.pagination-centered
+      div.row-fluid.centered
         div.span5.offset1.padded-t
           h4 1) Take BART
-          img(src='/img/bart.png').img-polaroid.filters
+          img(src='/img/bart.png').filters
         div.span5.padded-t
           h4 2) Private Shuttle or Walk  
-          img(src='/img/walking.png').img-polaroid.filters
+          img(src='/img/walking.png').filters
      
-      div.row
+      div.row-fluid
         div.span10.offset1
           div.padded
             h2.centered &sect;
@@ -96,7 +97,7 @@ block content
                     li <i>Transport public est à la mode</i>
 
     section.well
-      div.row
+      div.row-fluid
         div.span6.offset3
           h1.centered Our Sponsors
           p &nbsp;
@@ -128,6 +129,10 @@ block content
                 img(src="/img/logos/vertigo.png")
 
     section.well
+      div.row-fluid
+        div.span6.offset3
+          h1.centered Photos
+          p &nbsp;
       div.row-fluid
         div.span5.offset1
           blockquote 

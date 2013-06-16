@@ -1,3 +1,5 @@
+color-gold = hsl(50,48%,56%)
+
 ul.errors
   margin-top: 10px
   
@@ -6,17 +8,16 @@ ul.errors
 
 .heroimage
     width 100% 
-    background url('/img/ss-house1170.jpg') no-repeat top center #b1d95c
-
+    background url('/img/ss-house1170.jpg') no-repeat top center color-gold
 
 header
     color hsl(50,48%,56%)
 
 .section-directions
-    background url('/img/tile.png') repeat #b1d95c
+    background url('/img/tile.png') repeat color-gold
 
 body
-    background url('/img/tile.png') repeat #b1d95c
+    background url('/img/tile.png') repeat color-gold
 
 .padded-tb
     padding 30px 0
@@ -67,3 +68,16 @@ body
         padding-left 10px
 
 
+@media (max-width: 767px) 
+    .form-horizontal .control-label
+        float none
+        width auto
+        padding-top 0
+        text-align left
+    .form-horizontal .controls
+        margin-left 0
+    .form-horizontal .control-list
+        padding-top 0
+    .form-horizontal .form-actions
+        padding-right 10px
+        padding-left 10px
