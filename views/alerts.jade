@@ -10,8 +10,9 @@
       .alert=alerts.msg
         - y()
     when 'success'
-      .alert.alert-success=alerts.msg
-        - y()
+      .alert.alert-success
+          i.icon-ok
+          span= alerts.msg
     when 'error'
       .alert.alert-error #{alerts.msg}
         - y()

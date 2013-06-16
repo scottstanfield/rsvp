@@ -156,7 +156,7 @@
                             return renderMsg(Alert.error, genericErrorMsg);
                         }
 
-                        return renderMsg(Alert.success, 'Your code is valid. Thanks for RSVPing!');
+                        return renderMsg(Alert.success, ' Thank you for RSVPing. See you on June 26th!');
                     });
                 });
             });
