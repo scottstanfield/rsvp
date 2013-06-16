@@ -147,7 +147,10 @@
 
                     // successfully decremented and we have a valid partier
                     // save the registered partier's name
-                    client.hset('rsvp', email, JSON.stringify({ name: fullname, code: code }), function(err){
+
+                    var myData = fullname + '[' + code + ']';
+
+                    client.hset('rsvp', email, myData, function(err){
                         if(err) {
                             console.log(err);
                             return renderMsg(Alert.error, genericErrorMsg);
@@ -163,14 +166,20 @@
     var count = 0;
     app.get('/hash/:key', function(req, res) {
         var key = req.params.key;       // skipping validity checks
-//        console.log(key);
-//        console.log(++count);
-
-
         client.hgetall(key, function(err, hash) {
             res.send(hash);
         });
+    });
 
+    app.get('/partypeople', function(req, res) {
+        client.hgetall('rsvp', function(err, hash) {
+            var str = JSON.stringify(hash, null, true);
+            console.log(str); 
+            var xx = str.replace(/\[\w*\]/g, '');
+            var xx = xx.replace(/,/g, '\n');
+            console.log(xx);
+            res.send(xx);
+        });
     });
 
     app.get('/error', function(req, res) {
