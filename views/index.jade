@@ -3,7 +3,7 @@ block content
 
 
   div.container
-    header.heroimage
+    header.heroimage.hidden-phone
       div.container
         div.row-fluid
           div.span8.offset2
@@ -13,47 +13,53 @@ block content
     p &nbsp;
 
     section.well
-
       div.row-fluid
-        div.span4.offset2.centered
-          img(src='/img/msrd-logo-96px-alpha.png') 
-        div.span4.centered
-          h1 Party RSVP
-      div.row-fluid
-        h3.centered Wednesday, June 26th 6pm to 11pm
+        div.span8.offset2
+          h1.centered RSVP
 
       div.row-fluid
         div.span10.offset1
           include alerts
 
-      div.row
-        div.span5
-          form#rsvpform(action='/', method='post').form-horizontal
-            div.control-group
-              label.control-label(for='name') Full Name
-              div.controls
-                input#message_name.input-xlarge(type='text', placeholder='Name', name='fullname', value=fullname, autofocus='autofocus')
+      div.row-fluid
+        div.span6
+          div.row-fluid
+            div.span12
+              h5 Wednesday, June 26th 
+              h5 1330 Albina Ave, Berkeley
 
-            div.control-group
-              label.control-label(for='email') Email&dagger;
-              div.controls
-                input#message_email.input-xlarge(type='email', placeholder='Email', name='email', value=email)
+              form#rsvpform(action='/', method='post').form-horizontal
+                div.control-group
+                  label.control-label(for='name') Full Name
+                  div.controls
+                    input#message_name.input-large(type='text', placeholder='Name', name='fullname', value=fullname, autofocus='autofocus')
 
-            div.control-group
-              label.control-label(for='code') Code
-              div.controls
-                input#message_message.input-xlarge(type='text', placeholder='RSVP', name='code', value=code, autocapitalize='off', autocorrect='off', autocomplete='off')
-            
-            div.control-group
-              label.control-label(for='submit')
-              div.controls
-                button#submit.btn.btn-large.btn-inverse(name='submit', type='submit') Submit
-          
-        div.span5.offset1
+                div.control-group
+                  label.control-label(for='email') Email&dagger;
+                  div.controls
+                    input#message_email.input-large(type='email', placeholder='Email', name='email', value=email)
+
+                div.control-group
+                  label.control-label(for='code') Code
+                  div.controls
+                    input#message_message.input-large(type='text', placeholder='RSVP', name='code', value=code, autocapitalize='off', autocorrect='off', autocomplete='off')
+                
+                div.control-group
+                  label.control-label(for='submit')
+                  div.controls
+                    button#submit.btn.btn-large.btn-inverse(name='submit', type='submit') Submit
+
+        div.span6
+          img(src='/img/msrd-logo-96px-alpha.png') 
           p Note this is a private, invitation&hyphen;only party. You should have received your RSVP code in email. 
           p As there are a limited number of spaces available, RSVP early. No need to send your regrets if you can&rsquo;t make it.
           p If you&rsquo;re having trouble with the form, <a href="mailto:scott@vertigo.com">send me a note</a>.
           p &dagger;Your email won&rsquo;t be shared. We&rsquo;ll only use it to communicate details about the party.
+
+      div.row
+        div.span5
+          
+        div.span5.offset1
 
     p &nbsp;
 
