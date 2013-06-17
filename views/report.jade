@@ -1,0 +1,16 @@
+extends layout
+block content
+
+  h1 Code: #{code} has #{invitesLeft} invites left.
+
+  section.well
+      table.table.table-striped.table-hover
+        thead
+          tr
+            th Name 
+            th Email
+        tbody
+          each item in rsvps
+            tr
+              td= item.name
+              td= item.email
