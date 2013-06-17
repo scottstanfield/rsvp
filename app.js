@@ -182,6 +182,40 @@
         });
     });
 
+    app.get('/report/:code', function(req, res){
+
+        client.hgetall('rsvp', function(err, value) {
+            var result = [];
+            var code = req.params.code;
+            var match = "[" + code + "]";
+
+            for(var key in value) {
+                var val = value[key];
+                if((value[key] || "").indexOf(match) >= 0) {
+                    result.push({
+                        name: val.replace(match, ""), // trim the [code]
+                        email: key
+                    });
+                }
+            }
+
+            // sort by name
+            result = result.sort(function(a,b){
+                return a.name > b.name;
+            });
+
+            client.hget("codes", code, function(err, value) {
+                res.render("report", {
+                    rsvps: result,
+                    code: (code||"").toUpperCase(),
+                    invitesLeft: value || 0
+                });
+            });
+
+       });
+    
+    });
+
     app.get('/error', function(req, res) {
         res.render('500', { error: req });
     });
