@@ -205,12 +205,10 @@
             });
 
             client.hget("codes", code, function(err, value) {
-                console.log(result);
-
                 res.render("report", {
                     rsvps: result,
-                    code: code,
-                    invitesLeft: value
+                    code: (code||"").toUpperCase(),
+                    invitesLeft: value || 0
                 });
             });
 
