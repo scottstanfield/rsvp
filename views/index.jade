@@ -1,32 +1,35 @@
 extends layout
 block content
 
-
   div.container
-    header.heroimage.hidden-phone
+    header.heroimage
       div.container
         div.row-fluid
           div.span8.offset2
-            a(href='#').foo
-              img(src='/img/invite.png')
+            a(href='#')
+              img(src='/img/invite-small.png', data-src-large='/img/invite.png', alt='')
 
     p &nbsp;
 
     section.well
       div.row-fluid
-        div.span8.offset2
-          h1.centered RSVP
+        div.span4.centered.offset2
+          h1 RSVP
+        div.span4.centered
+          a(href='http://msrd.io')
+            img(src='/img/msrd-logo-grey.png') 
 
       div.row-fluid
-        div.span10.offset1
-          include alerts
+        div.span12.centered
+          h4 Wednesday, June 26th <br/> 6PM to 11PM <br/> <a href="http://j.mp/map1330albina">1330 Albina Ave ● Berkeley</a>
+          p &nbsp;
 
       div.row-fluid
         div.span6
           div.row-fluid
-            div.span12
-              h5 Wednesday, June 26th 
-              h5 1330 Albina Ave, Berkeley
+            div.span10.offset1
+              include alerts
+
 
               form#rsvpform(action='/', method='post').form-horizontal
                 div.control-group
@@ -50,7 +53,6 @@ block content
                     button#submit.btn.btn-large.btn-inverse(name='submit', type='submit') Submit
 
         div.span6
-          img(src='/img/msrd-logo-96px-alpha.png') 
           p Note this is a private, invitation&hyphen;only party. You should have received your RSVP code in email. 
           p As there are a limited number of spaces available, RSVP early. No need to send your regrets if you can&rsquo;t make it.
           p If you&rsquo;re having trouble with the form, <a href="mailto:scott@vertigo.com">send me a note</a>.
@@ -73,10 +75,10 @@ block content
             p &nbsp;
             p This is easy with our local subway, <a href='http://www.bart.gov', target='_blank'>BART</a>&Dagger;
             ol
-              li Head to the POWELL street or MONTGOMERY street station (both on Market St)
-              li Purchase a $3.75 ticket (or $7.50 for round-trip)
-              li Catch a RICHMOND train (red line) to NORTH BERKELEY
-              li Exit and either wait for the shuttle bus, or just walk the four blocks.
+              li Head to the POWELL street or MONTGOMERY street station (both on Market St).
+              li Purchase a $3.75 ticket (or $7.50 for round-trip).
+              li Catch a RICHMOND train (red line) to NORTH BERKELEY.
+              li Exit and either wait for our shuttle bus, or just walk the four blocks.
             p Here is the <a href="http://bit.ly/bart-jun26", target='_blank'>exact schedule</a> you need.
 
       div.row-fluid.centered
@@ -135,9 +137,9 @@ block content
             li
               a.thumbnail.span2(href="http://www.vertigo.com", target="_blank")
                 img(src="/img/logos/vertigo.png")
-            li
-              a.thumbnail.span3(href="http://www.msrd.io", target="_blank")
-                img(src="/img/msrd-logo-96px-alpha.png")
+            // li
+            //   a.thumbnail.span3(href="http://www.msrd.io", target="_blank")
+            //     img(src="/img/msrd-logo-96px-alpha.png")
 
     section.well
       div.row-fluid
@@ -149,7 +151,7 @@ block content
         div.span6.offset3
           blockquote 
             legend I like large parties. They&rsquo;re so intimate. At small parties there isn&rsquo;t any privacy.
-            h6 F. Scott Fitzgerald
+            h6 Jordan Baker in <u>The Great Gatsby</u>
 
         // div.span5
         //   div.rslides_container
