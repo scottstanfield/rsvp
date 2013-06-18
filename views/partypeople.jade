@@ -1,0 +1,17 @@
+extends layout
+block content
+
+  div.container
+    h2 #{commited} RSVPs
+
+    section.well
+        table.table.table-striped.table-hover
+          thead
+            tr
+              th Name 
+              th Email
+          tbody
+            each item in rsvps
+              tr
+                td= item.name
+                td= item.email
