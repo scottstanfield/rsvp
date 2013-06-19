@@ -9,6 +9,7 @@
     var expressValidator = require('express-validator');
 
     var genericErrorMsg = "bummer, an error occured";
+    var _ = require('underscore');
     
 
     // setup redis
@@ -177,8 +178,49 @@
             console.log(str); 
             var xx = str.replace(/\[\w*\]/g, '');
             var xx = xx.replace(/,/g, '\n');
-            console.log(xx);
             res.send(xx);
+        });
+    });
+
+    app.get('/partypeople/:password', function(req, res) {
+        var pw = process.env.PARTYPEOPLE || 'local';
+        if (req.params.password != pw)
+        {
+            res.redirect('/');
+        }
+
+        client.hgetall('rsvp', function(err, hash) {
+            var pattern = /(.*)\[(\w*)\]/i;
+            var rsvpTotal = 0;
+
+            var x = _.map(hash, function(v, k) {
+                rsvpTotal = rsvpTotal + 1;
+                var match = pattern.exec(v);
+                var person = {
+                    code: match[2],
+                    email: k,
+                    name: match[1]
+                };
+                return person;
+            });
+            var y = _.groupBy(x, function(i) { return i.code.toUpperCase(); });
+            // var y = _.countBy(x, function(i) { return i.code.toUpperCase(); });
+            //
+            //
+
+            for (var code in y) {
+                console.log(code);
+                for (var i =0; i < y[code].length; i++)
+                {
+                    console.log(y[code][i].name);
+                }
+            }
+
+
+            res.render("partypeople", {
+                groups: y,
+                rsvpTotal: rsvpTotal
+            });
         });
     });
 

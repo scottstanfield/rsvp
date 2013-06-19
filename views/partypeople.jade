@@ -2,16 +2,19 @@ extends layout
 block content
 
   div.container
-    h2 #{commited} RSVPs
+    h2 #{rsvpTotal} people have RSVPd
 
     section.well
-        table.table.table-striped.table-hover
-          thead
-            tr
-              th Name 
-              th Email
-          tbody
-            each item in rsvps
+      table.table.table-condensed
+        each code, c in groups
+            tbody
               tr
-                td= item.name
-                td= item.email
+                td
+                  h3= c
+                td
+                  h3= code.length
+              each person in code
+                tr
+                  td= person.name
+                  td= person.email
+
